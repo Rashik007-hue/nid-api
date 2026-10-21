@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // প্রোডাকশনে অফ
 ini_set('log_errors', 1);
-ini_set('error_log', sys_get_temp_dir() . '/error.log'); // Vercel এরর লগ ফিক্স
+ini_set('error_log', __DIR__ . '/error.log');
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -12,15 +12,8 @@ try {
     define('API_URL', BASE_URL . '/check/user/nid/verification');
     define('SECRET_KEY', 'lsg56xy14yu45dfgy124dfe12dr52fgd');
     
-    // 🔴 Vercel Path Fix: অরিজিনাল ফাইল রিড করবে, কিন্তু রাইট করবে /tmp ফোল্ডারে
-    define('SOURCE_ACCOUNTS_FILE', __DIR__ . '/accounts.json');
-    define('ACCOUNTS_FILE', sys_get_temp_dir() . '/accounts.json');
-    
-    // প্রথমবার রান হলে অরিজিনাল accounts.json থেকে ডাটা কপি করবে
-    if (!file_exists(ACCOUNTS_FILE) && file_exists(SOURCE_ACCOUNTS_FILE)) {
-        copy(SOURCE_ACCOUNTS_FILE, ACCOUNTS_FILE);
-    }
-    
+    // 🔴 Render-এর Persistent Disk-এর জন্য পাথ সেট করা হলো
+    define('ACCOUNTS_FILE', __DIR__ . '/data/accounts.json');
     define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
 
     // Helper ফাইল include করুন
@@ -124,7 +117,7 @@ try {
             
             $captcha = imagecreatefromstring($image_data);
             if ($captcha === false) {
-                throw new Exception('Failed to create image from captcha data. (GD extension missing?)');
+                throw new Exception('Failed to create image from captcha data');
             }
             
             $width = imagesx($captcha);
@@ -371,8 +364,13 @@ try {
             $dayIndex = date('w', $timestamp);
             
             $banglaDays = [
-                0 => 'রবিবার', 1 => 'সোমবার', 2 => 'মঙ্গলবার', 3 => 'বুধবার',
-                4 => 'বৃহস্পতিবার', 5 => 'শুক্রবার', 6 => 'শনিবার'
+                0 => 'রবিবার',
+                1 => 'সোমবার',
+                2 => 'মঙ্গলবার',
+                3 => 'বুধবার',
+                4 => 'বৃহস্পতিবার',
+                5 => 'শুক্রবার',
+                6 => 'শনিবার'
             ];
             
             return $banglaDays[$dayIndex] ?? '';
@@ -621,6 +619,15 @@ try {
     }
 
     // ==================== মেইন প্রসেস ====================
+    
+    // 🔴 DATA ফোল্ডার তৈরি করা (যদি না থাকে) এবং ডিফল্ট accounts.json কপি করা
+    if (!is_dir(__DIR__ . '/data')) {
+        mkdir(__DIR__ . '/data', 0777, true);
+    }
+    if (!file_exists(ACCOUNTS_FILE) && file_exists(__DIR__ . '/accounts.json')) {
+        copy(__DIR__ . '/accounts.json', ACCOUNTS_FILE);
+    }
+
     resetDailyAttempts();
 
     $nid = $_GET['nid'] ?? '';
@@ -769,7 +776,7 @@ try {
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-} catch (Throwable $e) {
+} catch (Throwable $e) { // 🔴 Exception এর বদলে Throwable ব্যবহার করা হলো
     http_response_code(500);
     echo json_encode([
         'code' => 500,
