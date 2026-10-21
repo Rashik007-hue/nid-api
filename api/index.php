@@ -12,7 +12,7 @@ try {
     define('API_URL', BASE_URL . '/check/user/nid/verification');
     define('SECRET_KEY', 'lsg56xy14yu45dfgy124dfe12dr52fgd');
     
-    // 🔴 Render-এর Persistent Disk-এর জন্য পাথ সেট করা হলো
+    // 🔴 Render-এর Persistent Disk-এর জন্য পাথ
     define('ACCOUNTS_FILE', __DIR__ . '/data/accounts.json');
     define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
 
@@ -620,7 +620,7 @@ try {
 
     // ==================== মেইন প্রসেস ====================
     
-    // 🔴 DATA ফোল্ডার তৈরি করা (যদি না থাকে) এবং ডিফল্ট accounts.json কপি করা
+    // ডাটা ফোল্ডার তৈরি করা (যদি না থাকে) এবং ডিফল্ট accounts.json কপি করা
     if (!is_dir(__DIR__ . '/data')) {
         mkdir(__DIR__ . '/data', 0777, true);
     }
@@ -638,6 +638,7 @@ try {
             'code' => 400,
             'success' => false,
             'message' => 'nid and dob required',
+            'owner' => 'https://t.me/RASHIK_69',
             'usage' => '?nid=7314475786&dob=1991-11-07'
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
@@ -653,7 +654,8 @@ try {
         echo json_encode([
             'code' => 400,
             'success' => false,
-            'message' => 'Invalid date format. Use YYYY-MM-DD'
+            'message' => 'Invalid date format. Use YYYY-MM-DD',
+            'owner' => 'https://t.me/RASHIK_69'
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -671,7 +673,8 @@ try {
         echo json_encode([
             'code' => 429,
             'success' => false,
-            'message' => 'All accounts reached daily limit'
+            'message' => 'All accounts reached daily limit',
+            'owner' => 'https://t.me/RASHIK_69'
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -764,6 +767,7 @@ try {
             'code' => 200,
             'success' => true,
             'message' => 'NID fetched successfully!',
+            'owner' => 'https://t.me/RASHIK_69',
             'data' => $final_data
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         
@@ -772,16 +776,18 @@ try {
             'code' => 500,
             'success' => false,
             'message' => $response_data['data'] ?? $last_error ?? 'Verification failed',
+            'owner' => 'https://t.me/RASHIK_69',
             'data' => null
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-} catch (Throwable $e) { // 🔴 Exception এর বদলে Throwable ব্যবহার করা হলো
+} catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         'code' => 500,
         'success' => false,
         'message' => 'Internal Server Error: ' . $e->getMessage(),
+        'owner' => 'https://t.me/RASHIK_69',
         'file' => $e->getFile(),
         'line' => $e->getLine(),
         'data' => null
