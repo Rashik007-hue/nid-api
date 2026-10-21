@@ -638,7 +638,7 @@ try {
             'code' => 400,
             'success' => false,
             'message' => 'nid and dob required',
-            'owner' => 'https://t.me/RASHIK_69',
+            'owner' => '@RASHIK_69',
             'usage' => '?nid=7314475786&dob=1991-11-07'
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
@@ -655,7 +655,7 @@ try {
             'code' => 400,
             'success' => false,
             'message' => 'Invalid date format. Use YYYY-MM-DD',
-            'owner' => 'https://t.me/RASHIK_69'
+            'owner' => '@RASHIK_69'
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -674,7 +674,7 @@ try {
             'code' => 429,
             'success' => false,
             'message' => 'All accounts reached daily limit',
-            'owner' => 'https://t.me/RASHIK_69'
+            'owner' => '@RASHIK_69'
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
     }
@@ -767,7 +767,7 @@ try {
             'code' => 200,
             'success' => true,
             'message' => 'NID fetched successfully!',
-            'owner' => 'https://t.me/RASHIK_69',
+            'owner' => '@RASHIK_69',
             'data' => $final_data
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         
@@ -776,7 +776,7 @@ try {
             'code' => 500,
             'success' => false,
             'message' => $response_data['data'] ?? $last_error ?? 'Verification failed',
-            'owner' => 'https://t.me/RASHIK_69',
+            'owner' => '@RASHIK_69',
             'data' => null
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
@@ -787,7 +787,7 @@ try {
         'code' => 500,
         'success' => false,
         'message' => 'Internal Server Error: ' . $e->getMessage(),
-        'owner' => 'https://t.me/RASHIK_69',
+        'owner' => '@RASHIK_69',
         'file' => $e->getFile(),
         'line' => $e->getLine(),
         'data' => null
