@@ -696,8 +696,11 @@ try {
             continue; 
         }
         
+        // 🔴 FIX: LSG সার্ভার থেকে আসা নতুন এরর মেসেজও ডিটেক্ট করা হবে
         if (isset($api_response['success']) && $api_response['success'] === "false" &&
-            isset($api_response['data']) && strpos($api_response['data'], 'সর্বোচ্চ সংখ্যকবার') !== false) {
+            isset($api_response['data']) && 
+            (strpos($api_response['data'], 'সর্বোচ্চ সংখ্যকবার') !== false || strpos($api_response['data'], 'অনুগ্রহপূর্বক সঠিক তথ্য') !== false)) {
+            
             $accounts = getAccounts();
             foreach ($accounts as &$acc) {
                 if ($acc['username'] === $account['username']) {
@@ -706,7 +709,7 @@ try {
                 }
             }
             file_put_contents(ACCOUNTS_FILE, json_encode($accounts, JSON_PRETTY_PRINT));
-            $last_error = 'Daily limit reached for: ' . $account['username'];
+            $last_error = 'Daily limit reached or invalid data for: ' . $account['username'];
             continue;
         }
         
