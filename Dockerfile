@@ -1,19 +1,21 @@
 FROM php:8.2-apache
 
-# GD লাইব্রেরির জন্য প্রয়োজনীয় সিস্টেম ডিপেন্ডেন্সি ইনস্টল করা
+# GD এবং mbstring লাইব্রেরি ইনস্টল করা (যা ইমেজ ও স্ট্রিং প্রসেসিংয়ের জন্য লাগে)
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
     libwebp-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) gd
+    && docker-php-ext-install -j$(nproc) gd mbstring
 
-# Apache-এ mod_rewrite চালু করা (প্রয়োজন হলে)
+# Apache-এ mod_rewrite চালু করা
 RUN a2enmod rewrite
 
-# প্রজেক্টের সব ফাইল কপি করা
+# সব ফাইল কন্টেইনারে কপি করা
 COPY . /var/www/html/
 
-# Apache রান করার জন্য পোর্ট এক্সপোজ করা
+# পারমিশন ঠিক করা (যাতে accounts.json রাইট করা যায়)
+RUN chown -R www-data:www-data /var/www/html/api
+
 EXPOSE 80
