@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // প্রোডাকশনে অফ
 ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/error.log');
+ini_set('error_log', sys_get_temp_dir() . '/error.log'); // Vercel এরর লগ ফিক্স
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -11,14 +11,23 @@ try {
     define('BASE_URL', 'https://lsg-land-owner-stage.land.gov.bd');
     define('API_URL', BASE_URL . '/check/user/nid/verification');
     define('SECRET_KEY', 'lsg56xy14yu45dfgy124dfe12dr52fgd');
-    define('ACCOUNTS_FILE', 'accounts.json');
+    
+    // 🔴 Vercel Path Fix: অরিজিনাল ফাইল রিড করবে, কিন্তু রাইট করবে /tmp ফোল্ডারে
+    define('SOURCE_ACCOUNTS_FILE', __DIR__ . '/accounts.json');
+    define('ACCOUNTS_FILE', sys_get_temp_dir() . '/accounts.json');
+    
+    // প্রথমবার রান হলে অরিজিনাল accounts.json থেকে ডাটা কপি করবে
+    if (!file_exists(ACCOUNTS_FILE) && file_exists(SOURCE_ACCOUNTS_FILE)) {
+        copy(SOURCE_ACCOUNTS_FILE, ACCOUNTS_FILE);
+    }
+    
     define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
 
     // Helper ফাইল include করুন
-    if (!file_exists('Helper.php')) {
+    if (!file_exists(__DIR__ . '/Helper.php')) {
         throw new Exception('Helper.php file not found');
     }
-    require_once 'Helper.php';
+    require_once __DIR__ . '/Helper.php';
 
     // ==================== NID Lookup Class ====================
     class NIDLookup {
@@ -115,7 +124,7 @@ try {
             
             $captcha = imagecreatefromstring($image_data);
             if ($captcha === false) {
-                throw new Exception('Failed to create image from captcha data');
+                throw new Exception('Failed to create image from captcha data. (GD extension missing?)');
             }
             
             $width = imagesx($captcha);
@@ -362,13 +371,8 @@ try {
             $dayIndex = date('w', $timestamp);
             
             $banglaDays = [
-                0 => 'রবিবার',
-                1 => 'সোমবার',
-                2 => 'মঙ্গলবার',
-                3 => 'বুধবার',
-                4 => 'বৃহস্পতিবার',
-                5 => 'শুক্রবার',
-                6 => 'শনিবার'
+                0 => 'রবিবার', 1 => 'সোমবার', 2 => 'মঙ্গলবার', 3 => 'বুধবার',
+                4 => 'বৃহস্পতিবার', 5 => 'শুক্রবার', 6 => 'শনিবার'
             ];
             
             return $banglaDays[$dayIndex] ?? '';
