@@ -769,12 +769,14 @@ try {
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         'code' => 500,
         'success' => false,
         'message' => 'Internal Server Error: ' . $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
         'data' => null
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 }
